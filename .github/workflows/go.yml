@@ -1,0 +1,23 @@
+name: Build and test Go
+on: [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.2
+
+      - name: Check out source code
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: go build .
+
+      - name: Format Check
+        run: test -z $(gofmt -l ./...)
+
+      - name: Test
+        run: go test -v ./...
