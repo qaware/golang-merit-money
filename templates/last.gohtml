@@ -1,0 +1,11 @@
+{{ template "header.tmpl" . }}
+{{ range .Rewards }}
+    <blockquote>
+        Dear <b>{{ .To }}</b>. </br>
+        {{ .Note }} ({{ .Amount }} 🪙)
+        <footer>
+            <cite>- {{ .From }} </cite>
+        </footer>
+    </blockquote>
+{{ end }}
+{{ template "footer.tmpl" . }}
