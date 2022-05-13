@@ -1,0 +1,11 @@
+{{ template "header.tmpl" . }}
+{{ range .Rewards }}
+    <blockquote>
+{{/*        <img src="https://robohash.com/{{ .To }}"/>*/}}
+        {{ .Description }}
+        <footer>
+            <cite> {{ .From }} </cite>
+        </footer>
+    </blockquote>
+{{ end }}
+{{ template "footer.tmpl" . }}
