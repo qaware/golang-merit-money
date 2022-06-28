@@ -59,7 +59,7 @@ func initDebugData(meritMoney *business.MeritMoney, usersRepository *adapter.InM
 	for _, reward := range rewards {
 		err := meritMoney.GiveReward(reward.From, reward.To, reward.Amount, reward.Note)
 		if err != nil {
-			log.Panicf("could not store rewared debug data %s", reward)
+			log.Panic("could not store reward debug data")
 		}
 	}
 
