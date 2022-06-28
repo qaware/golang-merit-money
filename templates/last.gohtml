@@ -1,10 +1,10 @@
 {{ template "header.tmpl" . }}
 {{ range .Rewards }}
     <blockquote>
-{{/*        <img src="https://robohash.com/{{ .To }}"/>*/}}
-        {{ .Description }}
+        Dear <b>{{ .To }}</b>. </br>
+        {{ .Note }} ({{ .Amount }} 🪙)
         <footer>
-            <cite> {{ .From }} </cite>
+            <cite>- {{ .From }} </cite>
         </footer>
     </blockquote>
 {{ end }}

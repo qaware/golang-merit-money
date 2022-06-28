@@ -1,41 +1,91 @@
 package main
 
 import (
+	"de.qaware.golang-merit-money/adapter"
+	"de.qaware.golang-merit-money/business"
+	"de.qaware.golang-merit-money/web"
+	"flag"
 	"github.com/gin-gonic/gin"
-	"net/http"
-)
-
-const (
-	about = "about.gohtml"
-	last  = "last.gohtml"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	usersRepository := adapter.NewInMemoryUsersRepository()
+	meritMoney := business.NewMeritMoney(
+		usersRepository,
+		adapter.NewInMemoryRewardsRepository(),
+		&adapter.RealClock{},
+	)
+
+	var developmentMode bool
+	flag.BoolVar(&developmentMode, "development", false, "true|false initializes the application with debug data. default: false")
+	flag.Parse()
+	if developmentMode {
+		log.SetLevel(log.DebugLevel)
+		log.Debugln("development mode is on.")
+		initDebugData(meritMoney, usersRepository)
+	}
 
 	engine := gin.Default()
 	engine.LoadHTMLGlob("templates/*")
 
-	engine.GET(about, func(context *gin.Context) {
-		context.HTML(200, about, nil)
-	})
+	userController := web.NewUserControllers(meritMoney)
+	userController.Register(engine)
 
-	engine.GET("", func(context *gin.Context) {
-		context.Redirect(http.StatusMovedPermanently, about)
-	})
-
-	engine.GET(last, func(context *gin.Context) {
-		rewards := []struct {
-			From        string
-			To          string
-			Description string
-		}{
-			{From: "Alex", Description: "Thanks for helping me out the other day.", To: "Felix"},
-			{From: "Felix", Description: "It is fun working with you.", To: "Tim"},
-			{From: "Timo", Description: "Thanks for finding my bug.", To: "Alex"},
-		}
-		context.HTML(200, last, gin.H{
-			"Rewards": rewards,
-		})
-	})
 	_ = engine.Run(":8080")
+}
+
+func initDebugData(meritMoney *business.MeritMoney, usersRepository *adapter.InMemoryUsersRepository) {
+	rewards := []business.Reward{
+		{
+			From:   1,
+			To:     2,
+			Note:   "Thanks for helping me out the other day.",
+			Amount: 1,
+		},
+		{
+			From:   3,
+			To:     4,
+			Note:   "It is fun working with you.",
+			Amount: 2,
+		},
+		{
+			From:   2,
+			To:     1,
+			Note:   "Thanks for finding my bug.",
+			Amount: 3,
+		},
+	}
+	for _, reward := range rewards {
+		err := meritMoney.GiveReward(reward.From, reward.To, reward.Amount, reward.Note)
+		if err != nil {
+			log.Panicf("could not store rewared debug data %s", reward)
+		}
+	}
+
+	users := []business.User{
+		{
+			Id:   1,
+			Name: "Timo",
+		},
+		{
+			Id:   2,
+			Name: "Alex",
+		},
+		{
+			Id:   3,
+			Name: "Dirk",
+		},
+		{
+			Id:   4,
+			Name: "Markus",
+		},
+	}
+
+	for _, user := range users {
+		err := usersRepository.Store(user)
+		if err != nil {
+			log.Panicf("could initialize debug data %s", user)
+		}
+	}
 }
