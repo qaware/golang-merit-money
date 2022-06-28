@@ -11,8 +11,6 @@ ports:
     port: 8080
     onOpen: open-browser
 
-jetbrains:
-  intellij:
-    plugins:
-      - org.jetbrains.plugins.go
-      - org.jetbrains.plugins.go-template
+vscode:
+  extensions:
+    - golang.go
