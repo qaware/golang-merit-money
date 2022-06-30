@@ -1,7 +1,27 @@
 name: Build and test Go
 on: [push, pull_request]
 jobs:
-  build:
+  lint:
+    name: Linting format and golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.2
+
+      - name: Check out source code
+        uses: actions/checkout@v3
+
+      - name: Format Check
+        run: test -z $(gofmt -l ./...)
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.46.2
+
+  test:
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -13,16 +33,16 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v3
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: v1.46.2
-
-      - name: Build
-        run: go build .
-
-      - name: Format Check
-        run: test -z $(gofmt -l ./...)
-
       - name: Test
-        run: go test -v ./...
+        run: go test -v -race -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          path_to_write_report: ./coverage/codecov_report.txt
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: ./coverage/codecov_report.txt
