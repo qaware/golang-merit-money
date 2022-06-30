@@ -1,10 +1,11 @@
 package main
 
 import (
+	"flag"
+
 	"de.qaware.golang-merit-money/adapter"
 	"de.qaware.golang-merit-money/business"
 	"de.qaware.golang-merit-money/web"
-	"flag"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -85,7 +86,7 @@ func initDebugData(meritMoney *business.MeritMoney, usersRepository *adapter.InM
 	for _, user := range users {
 		err := usersRepository.Store(user)
 		if err != nil {
-			log.Panicf("could initialize debug data %s", user)
+			log.Panicf("could initialize debug data %v", user)
 		}
 	}
 }
