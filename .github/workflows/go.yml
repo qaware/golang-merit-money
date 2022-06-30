@@ -40,6 +40,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           path_to_write_report: ./coverage/codecov_report.txt
+          dry_run: true
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
