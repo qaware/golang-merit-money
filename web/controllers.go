@@ -1,10 +1,11 @@
 package web
 
 import (
-	"de.qaware.golang-merit-money/business"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"de.qaware.golang-merit-money/business"
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -31,6 +32,7 @@ func (u *UserControllers) Register(engine *gin.Engine) {
 	engine.GET(Index, u.GetIndex)
 	engine.GET(About, u.GetAbout)
 	engine.GET(Give, u.GetGive)
+	engine.POST(Give, u.PostGive)
 	engine.GET(Last, u.GetLast)
 }
 
@@ -49,18 +51,21 @@ func (u *UserControllers) GetGive(context *gin.Context) {
 		return
 	}
 	userModels := u.usersToModel(users)
-	giveModel := giveModel{Users: userModels}
+	giveModel := giveModel{
+		Users:   userModels,
+		PostUrl: Give,
+	}
 
 	context.HTML(200, Give, giveModel)
 }
 
 func (u *UserControllers) PostGive(context *gin.Context) {
-	from, err := business.NewUuidFromString(context.PostForm("from"))
+	from, err := business.NewUuidFromString(context.PostForm("userFrom"))
 	if err != nil {
 		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
 		return
 	}
-	to, err := business.NewUuidFromString(context.PostForm("to"))
+	to, err := business.NewUuidFromString(context.PostForm("userFor"))
 	if err != nil {
 		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
 		return
@@ -71,12 +76,13 @@ func (u *UserControllers) PostGive(context *gin.Context) {
 		return
 	}
 	note := context.PostForm("note")
-	err = u.usecases.GiveReward(from, to, amount, note); if err != nil {
+	err = u.usecases.GiveReward(from, to, amount, note)
+	if err != nil {
 		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
-		return 
+		return
 	}
 
-	context.Redirect(http.StatusTemporaryRedirect, Last)
+	context.Redirect(http.StatusSeeOther, Last)
 }
 
 func (u *UserControllers) GetLast(context *gin.Context) {
@@ -103,7 +109,8 @@ func (u *UserControllers) GetLast(context *gin.Context) {
 }
 
 type giveModel struct {
-	Users []userModel
+	Users   []userModel
+	PostUrl string
 }
 
 type userModel struct {

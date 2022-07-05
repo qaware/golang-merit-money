@@ -84,15 +84,6 @@ func (m *MeritMoney) AllUsers() ([]User, error) {
 	return m.users.All()
 }
 
-//func (m *MeritMoney) findUserByName(name string) (bool, User, error) {
-//	users, err := m.users.All()
-//	if err != nil {
-//		return false, User{}, err
-//	}
-//	foundUser := sliceFind(users, func(user User) bool { return user.Name == name })
-//	return true, *foundUser, nil
-//}
-
 func (m *MeritMoney) FindById(id Uuid) (bool, User, error) {
 	users, err := m.users.All()
 	if err != nil {
