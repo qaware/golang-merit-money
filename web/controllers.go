@@ -43,6 +43,9 @@ func (u *UserControllers) GetAbout(context *gin.Context) {
 }
 
 func (u *UserControllers) GetGive(context *gin.Context) {
+	users, err := u.usecases.AllUsers(); if err != nil {
+
+	}
 	context.HTML(200, Give, nil)
 }
 

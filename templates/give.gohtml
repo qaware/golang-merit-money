@@ -1,3 +1,19 @@
 {{ template "header.tmpl" . }}
-<div>TODO</div>
+<p>Give your pal a rewared.</p>
+
+<form>
+    <label for="userFor">For:</label><br>
+    <select id="userFor" name="userFor">
+        <option value="volvo">Volvo</option>
+    </select><br>
+    <label for="userFrom">From:</label><br>
+    <select id="userFrom" name="userFrom">
+        <option value="volvo">Volvo</option>
+    </select><br>
+    <label for="note">Note:</label><br>
+    <input id="note" name="note" type="text"><br>
+    <label for="amount">Amount:</label><br>
+    <input id="amount" name="amount" type="number" min="1" max="3" value="1"><br>
+    <input type="submit">
+</form> 
 {{ template "footer.tmpl" . }}
