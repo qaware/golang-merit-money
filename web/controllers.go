@@ -43,10 +43,40 @@ func (u *UserControllers) GetAbout(context *gin.Context) {
 }
 
 func (u *UserControllers) GetGive(context *gin.Context) {
-	users, err := u.usecases.AllUsers(); if err != nil {
-
+	users, err := u.usecases.AllUsers()
+	if err != nil {
+		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		return
 	}
-	context.HTML(200, Give, nil)
+	userModels := u.usersToModel(users)
+	giveModel := giveModel{Users: userModels}
+
+	context.HTML(200, Give, giveModel)
+}
+
+func (u *UserControllers) PostGive(context *gin.Context) {
+	from, err := business.NewUuidFromString(context.PostForm("from"))
+	if err != nil {
+		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		return
+	}
+	to, err := business.NewUuidFromString(context.PostForm("to"))
+	if err != nil {
+		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		return
+	}
+	amount, err := business.NewQaCoin(context.PostForm("amount"))
+	if err != nil {
+		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		return
+	}
+	note := context.PostForm("note")
+	err = u.usecases.GiveReward(from, to, amount, note); if err != nil {
+		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		return 
+	}
+
+	context.Redirect(http.StatusTemporaryRedirect, Last)
 }
 
 func (u *UserControllers) GetLast(context *gin.Context) {
@@ -61,7 +91,7 @@ func (u *UserControllers) GetLast(context *gin.Context) {
 		return
 	}
 
-	dtos, err := u.rewardsToDto(rewards)
+	dtos, err := u.rewardsToModel(rewards)
 	if err != nil {
 		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
 		return
@@ -72,7 +102,27 @@ func (u *UserControllers) GetLast(context *gin.Context) {
 	})
 }
 
-type rewardsDto struct {
+type giveModel struct {
+	Users []userModel
+}
+
+type userModel struct {
+	Id   string
+	Name string
+}
+
+func (u *UserControllers) usersToModel(users []business.User) []userModel {
+	models := make([]userModel, 0)
+	for _, user := range users {
+		models = append(models, userModel{
+			Id:   user.Id.String(),
+			Name: user.Name,
+		})
+	}
+	return models
+}
+
+type rewardsModel struct {
 	From   string
 	To     string
 	Amount string
@@ -80,7 +130,7 @@ type rewardsDto struct {
 	Note   string
 }
 
-func (u *UserControllers) rewardsToDto(rewards []business.Reward) ([]rewardsDto, error) {
+func (u *UserControllers) rewardsToModel(rewards []business.Reward) ([]rewardsModel, error) {
 	users, err := u.usecases.AllUsers()
 	if err != nil {
 		return nil, err
@@ -90,9 +140,9 @@ func (u *UserControllers) rewardsToDto(rewards []business.Reward) ([]rewardsDto,
 		userMap[user.Id] = user
 	}
 
-	dtos := make([]rewardsDto, 0)
+	models := make([]rewardsModel, 0)
 	for _, reward := range rewards {
-		dtos = append(dtos, rewardsDto{
+		models = append(models, rewardsModel{
 			From:   userMap[reward.From].Name,
 			To:     userMap[reward.To].Name,
 			Amount: strconv.Itoa(int(reward.Amount)),
@@ -101,5 +151,5 @@ func (u *UserControllers) rewardsToDto(rewards []business.Reward) ([]rewardsDto,
 		})
 	}
 
-	return dtos, nil
+	return models, nil
 }

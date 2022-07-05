@@ -1,15 +1,40 @@
 package business
 
-import "time"
+import (
+	"strconv"
+	"time"
+
+	"github.com/pkg/errors"
+)
 
 type Uuid uint32
+
+func (u Uuid) String() string {
+	return strconv.Itoa(int(u))
+}
+
+func NewUuidFromString(from string) (Uuid, error) {
+	num, err := strconv.ParseUint(from, 10, 32)
+	if err != nil {
+		return Uuid(0), errors.Wrapf(err, "could not parse %s as Uuid", from)
+	}
+	return Uuid(num), nil
+}
 
 type User struct {
 	Id   Uuid
 	Name string
 }
 
-type QaCoin uint
+type QaCoin uint32
+
+func NewQaCoin(from string) (QaCoin, error) {
+	num, err := strconv.ParseUint(from, 10, 32)
+	if err != nil {
+		return QaCoin(0), errors.Wrapf(err, "could not parse %s as QaCoin", from)
+	}
+	return QaCoin(num), nil
+}
 
 type Reward struct {
 	From   Uuid

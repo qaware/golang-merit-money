@@ -1,17 +1,21 @@
 {{ template "header.tmpl" . }}
 <p>Give your pal a rewared.</p>
 
-<form>
+<form action="/give" method="post">
     <label for="userFor">For:</label><br>
     <select id="userFor" name="userFor">
-        <option value="volvo">Volvo</option>
+    {{ range .Users }}
+        <option value="{{ .Id }}">{{ .Name }}</option>
+    {{ end }}
     </select><br>
     <label for="userFrom">From:</label><br>
     <select id="userFrom" name="userFrom">
-        <option value="volvo">Volvo</option>
+    {{ range .Users }}
+        <option value="{{ .Id }}">{{ .Name }}</option>
+    {{ end }}
     </select><br>
     <label for="note">Note:</label><br>
-    <input id="note" name="note" type="text"><br>
+    <input id="note" name="note" type="text" required><br>
     <label for="amount">Amount:</label><br>
     <input id="amount" name="amount" type="number" min="1" max="3" value="1"><br>
     <input type="submit">
