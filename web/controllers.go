@@ -41,7 +41,7 @@ func (u *UserControllers) GetIndex(context *gin.Context) {
 }
 
 func (u *UserControllers) GetAbout(context *gin.Context) {
-	context.HTML(200, About, nil)
+	context.HTML(http.StatusOK, About, nil)
 }
 
 func (u *UserControllers) GetGive(context *gin.Context) {
@@ -56,33 +56,47 @@ func (u *UserControllers) GetGive(context *gin.Context) {
 		PostUrl: Give,
 	}
 
-	context.HTML(200, Give, giveModel)
+	context.HTML(http.StatusOK, Give, giveModel)
 }
 
 func (u *UserControllers) PostGive(context *gin.Context) {
-	from, err := business.NewUuidFromString(context.PostForm("userFrom"))
+	var creationDto RewardCreationDto
+	err := context.ShouldBind(&creationDto)
 	if err != nil {
-		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		context.HTML(http.StatusBadRequest, ErrorPage, nil)
 		return
 	}
-	to, err := business.NewUuidFromString(context.PostForm("userFor"))
+
+	from, err := business.NewUuidFromString(creationDto.UserFrom)
 	if err != nil {
-		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		context.HTML(http.StatusBadRequest, ErrorPage, nil)
 		return
 	}
-	amount, err := business.NewQaCoin(context.PostForm("amount"))
+
+	to, err := business.NewUuidFromString(creationDto.UserFor)
 	if err != nil {
-		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
+		context.HTML(http.StatusBadRequest, ErrorPage, nil)
 		return
 	}
-	note := context.PostForm("note")
-	err = u.usecases.GiveReward(from, to, amount, note)
+	amount, err := business.NewQaCoin(creationDto.Amount)
+	if err != nil {
+		context.HTML(http.StatusBadRequest, ErrorPage, nil)
+		return
+	}
+	err = u.usecases.GiveReward(from, to, amount, creationDto.Note)
 	if err != nil {
 		context.HTML(http.StatusInternalServerError, ErrorPage, nil)
 		return
 	}
 
 	context.Redirect(http.StatusSeeOther, Last)
+}
+
+type RewardCreationDto struct {
+	UserFrom string `form:"userFrom"`
+	UserFor  string `form:"userFor"`
+	Amount   string `form:"amount"`
+	Note     string `form:"note"`
 }
 
 func (u *UserControllers) GetLast(context *gin.Context) {
@@ -103,7 +117,7 @@ func (u *UserControllers) GetLast(context *gin.Context) {
 		return
 	}
 
-	context.HTML(200, Last, gin.H{
+	context.HTML(http.StatusOK, Last, gin.H{
 		"Rewards": dtos,
 	})
 }
