@@ -1,5 +1,7 @@
 FROM gitpod/workspace-full
 
+USER root
+
 RUN install-packages  \
         shellcheck && \
         golangci-lint && \
