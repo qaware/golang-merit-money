@@ -11,7 +11,7 @@ tasks:
 ports:
   - name: Web App
     port: 8080
-    onOpen: notify
+    onOpen: open-preview
 
 vscode:
   extensions:
