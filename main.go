@@ -25,6 +25,7 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 		log.Debugln("development mode is on.")
 		initDebugData(meritMoney, usersRepository)
+
 	}
 
 	engine := gin.Default()
