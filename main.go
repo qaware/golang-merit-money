@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 
 	"de.qaware.golang-merit-money/adapter"
 	"de.qaware.golang-merit-money/business"
@@ -23,7 +24,7 @@ func main() {
 	flag.Parse()
 	if developmentMode {
 		log.SetLevel(log.DebugLevel)
-		log.Debugln("development mode is on.")
+		fmt.Printf("development mode is %s on")
 		initDebugData(meritMoney, usersRepository)
 
 	}
