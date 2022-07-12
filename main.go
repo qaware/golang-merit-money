@@ -37,10 +37,6 @@ func main() {
 	_ = engine.Run(":8080")
 }
 
-func takeOverTheWorld() {
-	// TODO implement
-}
-
 func initDebugData(meritMoney *business.MeritMoney, usersRepository *adapter.InMemoryUsersRepository) {
 	rewards := []business.Reward{
 		{
