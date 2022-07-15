@@ -1,3 +1,23 @@
 {{ template "header.tmpl" . }}
-<div>TODO</div>
+<p>Give your pal a rewared.</p>
+
+<form action="{{ .PostUrl }}" method="post">
+    <label for="userFrom">From:</label><br>
+    <select id="userFrom" name="userFrom">
+    {{- range .Users }}
+        <option value="{{ .Id }}">{{ .Name }}</option>
+    {{- end }}
+    </select><br>
+    <label for="userFor">For:</label><br>
+    <select id="userFor" name="userFor">
+    {{- range .Users }}
+        <option value="{{ .Id }}">{{ .Name }}</option>
+    {{- end }}
+    </select><br>
+    <label for="note">Note:</label><br>
+    <input id="note" name="note" type="text" required><br>
+    <label for="amount">Amount:</label><br>
+    <input id="amount" name="amount" type="number" min="1" max="3" value="1"><br>
+    <input type="submit">
+</form> 
 {{ template "footer.tmpl" . }}

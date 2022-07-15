@@ -24,7 +24,8 @@ func (i *InMemoryRewardsRepository) Last(limit uint) ([]business.Reward, error) 
 }
 
 func (i *InMemoryRewardsRepository) Store(reward business.Reward) error {
-	i.data = append(i.data, reward)
+	head := []business.Reward{reward}
+	i.data = append(head, i.data...)
 	return nil
 }
 
